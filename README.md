@@ -1,0 +1,14 @@
+- express → core web framework (routes, middleware)
+- mongoose → MongoDB ke liye ORM
+- dotenv → environment variables manage karne ke liye
+- cors → React Native app ke sath cross-origin requests allow karne ke liye
+- cookie-parser → cookies handle karne ke liye (agar web clients bhi hon)
+- jsonwebtoken → authentication / JWT tokens ke liye
+- bcryptjs → password hashing
+- morgan → request logging
+- multer → file uploads (images, docs)
+- cloudinary → image storage/management
+- nodemailer → emails bhejne ke liye
+- socket.io → real-time communication (chat, notifications)
+- stripe → payments integration
+- nodemon (devDependency) → auto-restart server during development

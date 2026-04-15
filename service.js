@@ -1,0 +1,46 @@
+import express from "express";
+import authRoutes from "./routes/authRoutes.js";
+import cookieParser from "cookie-parser";
+import connectDB from "./config/db.js";
+// const cors = require('cors');
+import dotenv from "dotenv";
+dotenv.config();
+
+connectDB();
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+// app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+// Routes
+app.get("/", (req, res) => {
+  res.send("Welcome to AwesomeProject backend!");
+});
+
+app.get("/api/health", (req, res) => {
+  res.json({ status: "OK", message: "Service is running" });
+});
+
+app.get("/api/data", (req, res) => {
+  res.json({ data: [] });
+});
+
+app.use("/api/auth", authRoutes);
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: "Internal Server Error" });
+});
+
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
+
+export default app;

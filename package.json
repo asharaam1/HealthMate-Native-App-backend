@@ -1,0 +1,31 @@
+{
+  "name": "awesomeproject-backend",
+  "version": "1.0.0",
+  "description": "Backend for AwesomeProject",
+  "main": "service.js",
+  "scripts": {
+    "start": "node service.js",
+    "dev": "nodemon service.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.9.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.1",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.4.1",
+    "morgan": "^1.10.1",
+    "multer": "^2.1.1",
+    "nodemailer": "^8.0.5",
+    "nodemon": "^3.1.14",
+    "socket.io": "^4.8.3",
+    "stripe": "^22.0.1"
+  }
+}
