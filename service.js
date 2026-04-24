@@ -5,6 +5,7 @@ import connectDB from "./config/db.js";
 // const cors = require('cors');
 import dotenv from "dotenv";
 dotenv.config();
+import reportRoutes from './routes/reportRoutes.js';
 
 connectDB();
 const app = express();
@@ -18,7 +19,7 @@ app.use(cookieParser());
 
 // Routes
 app.get("/", (req, res) => {
-  res.send("Welcome to AwesomeProject backend!");
+  res.send("💚 HealthMate API - Sehat ka Smart Dost");
 });
 
 app.get("/api/health", (req, res) => {
@@ -29,7 +30,9 @@ app.get("/api/data", (req, res) => {
   res.json({ data: [] });
 });
 
+// API routes
 app.use("/api/auth", authRoutes);
+app.use('/api/reports', reportRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

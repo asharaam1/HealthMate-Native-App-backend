@@ -27,5 +27,8 @@
     "nodemon": "^3.1.14",
     "socket.io": "^4.8.3",
     "stripe": "^22.0.1"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1"
   }
 }
