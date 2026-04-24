@@ -21,14 +21,22 @@ export const uploadReport = async (req, res) => {
       });
     }
 
-    // Determine file type
-    const fileType = req.file.mimetype.includes("pdf") ? "pdf" : "image";
+    console.log("📁 File received:", {
+      originalname: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size
+    });
 
+    // Create base64 string properly
+    const base64String = req.file.buffer.toString('base64');
+    const dataUri = `data:${req.file.mimetype};base64,${base64String}`;
+
+    console.log("☁️ Uploading to Cloudinary...");
+    
     // Upload to Cloudinary
-    const uploadResult = await uploadImage(
-      `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
-      "healthmate/reports"
-    );
+    const uploadResult = await uploadImage(dataUri, "healthmate/reports");
+
+    console.log("✅ Uploaded to Cloudinary:", uploadResult.url);
 
     const report = await Report.create({
       userId: req.user.id,
@@ -39,12 +47,13 @@ export const uploadReport = async (req, res) => {
       file: {
         url: uploadResult.url,
         publicId: uploadResult.publicId,
-        fileType,
+        fileType: req.file.mimetype.includes("pdf") ? "pdf" : "image",
       },
       notes,
       isProcessed: false,
     });
 
+    // Start AI processing in background
     processReportWithAI(report._id, uploadResult.url, reportType);
 
     res.status(201).json({
@@ -53,7 +62,7 @@ export const uploadReport = async (req, res) => {
       report,
     });
   } catch (error) {
-    console.error("Upload report error:", error);
+    console.error("❌ Upload report error:", error);
     res.status(500).json({
       success: false,
       message: error.message || "Error uploading report",
