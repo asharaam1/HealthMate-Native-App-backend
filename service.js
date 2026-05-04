@@ -6,8 +6,9 @@ import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
 // const cors = require('cors');
 import authRoutes from "./routes/authRoutes.js";
-import reportRoutes from './routes/reportRoutes.js';
+import reportRoutes from "./routes/reportRoutes.js";
 import familyMemberRoutes from "./routes/familyMemberRoutes.js";
+import vitalsRoutes from "./routes/vitalsRoutes.js";
 
 connectDB();
 const app = express();
@@ -34,15 +35,15 @@ app.get("/api/data", (req, res) => {
 
 // API routes
 app.use("/api/auth", authRoutes);
-app.use('/api/reports', reportRoutes);
 app.use("/api/family-members", familyMemberRoutes);
+app.use("/api/reports", reportRoutes);
+app.use("/api/vitals", vitalsRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: "Internal Server Error" });
 });
-
 
 // Start server
 app.listen(PORT, () => {

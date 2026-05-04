@@ -17,22 +17,23 @@ export const uploadReport = async (req, res) => {
     if (!title || !reportType || !reportDate || !familyMemberId) {
       return res.status(400).json({
         success: false,
-        message: "Please provide title, report type, report date, and family member",
+        message:
+          "Please provide title, report type, report date, and family member",
       });
     }
 
     console.log("📁 File received:", {
       originalname: req.file.originalname,
       mimetype: req.file.mimetype,
-      size: req.file.size
+      size: req.file.size,
     });
 
     // Create base64 string properly
-    const base64String = req.file.buffer.toString('base64');
+    const base64String = req.file.buffer.toString("base64");
     const dataUri = `data:${req.file.mimetype};base64,${base64String}`;
 
     console.log("☁️ Uploading to Cloudinary...");
-    
+
     // Upload to Cloudinary
     const uploadResult = await uploadImage(dataUri, "healthmate/reports");
 
@@ -75,20 +76,27 @@ const processReportWithAI = async (reportId, fileUrl, reportType) => {
     console.log(`\n🤖 Starting AI processing for report: ${reportId}`);
     console.log(`📋 Report Type: ${reportType}`);
     console.log(`� File URL: ${fileUrl}`);
+    console.log(`🔑 Gemini API Key present:`, !!process.env.GEMINI_API_KEY);
 
     const aiAnalysis = await analyzeMedicalReport(fileUrl, reportType);
+
+    console.log(
+      `📊 AI Response received:`,
+      aiAnalysis.success ? "✅ Success" : "❌ Failed",
+    );
+    console.log(`📊 AI Response:`, aiAnalysis.data);
 
     if (aiAnalysis.success) {
       console.log(`✅ AI analysis successful for report: ${reportId}`);
       console.log(
         `📊 Summary length: ${
           aiAnalysis.data.englishSummary?.length || 0
-        } chars`
+        } chars`,
       );
       console.log(
         `🔢 Abnormal values found: ${
           aiAnalysis.data.abnormalValues?.length || 0
-        }`
+        }`,
       );
 
       await Report.findByIdAndUpdate(reportId, {
@@ -100,7 +108,7 @@ const processReportWithAI = async (reportId, fileUrl, reportType) => {
       console.log(`💾 Report ${reportId} updated successfully`);
     } else {
       console.log(
-        `⚠️ AI analysis returned success=false for report: ${reportId}`
+        `⚠️ AI analysis returned success=false for report: ${reportId}`,
       );
       await Report.findByIdAndUpdate(reportId, {
         isProcessed: false,
@@ -110,7 +118,7 @@ const processReportWithAI = async (reportId, fileUrl, reportType) => {
   } catch (error) {
     console.error(
       `❌ AI processing error for report ${reportId}:`,
-      error.message
+      error.message,
     );
     console.error("Full error:", error);
 
@@ -123,7 +131,14 @@ const processReportWithAI = async (reportId, fileUrl, reportType) => {
 
 export const getReports = async (req, res) => {
   try {
-    const { reportType, startDate, endDate, familyMemberId, limit = 50, page = 1 } = req.query;
+    const {
+      reportType,
+      startDate,
+      endDate,
+      familyMemberId,
+      limit = 50,
+      page = 1,
+    } = req.query;
 
     const query = { userId: req.user.id };
 
@@ -144,7 +159,7 @@ export const getReports = async (req, res) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const reports = await Report.find(query)
-      .populate('familyMemberId', 'name relationship profileImage')
+      .populate("familyMemberId", "name relationship profileImage")
       .sort({ reportDate: -1 })
       .limit(parseInt(limit))
       .skip(skip);
