@@ -7,6 +7,7 @@ import {
   updateReport,
   deleteReport,
   getReportsStats,
+  getPendingAnalysisReports,
 } from "../controllers/reportController.js";
 import { protect } from "../middlewares/auth.js";
 import upload from "../middlewares/upload.js";
@@ -22,5 +23,6 @@ router.get("/", getReports);
 router.get("/:id", getReportById);
 router.put("/:id", updateReport);
 router.delete("/:id", deleteReport);
+router.get('/pending-analysis', protect, getPendingAnalysisReports);
 
 export default router;

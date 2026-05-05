@@ -1,5 +1,6 @@
 import User from "../models/UserDetails.js";
 import { sendTokenResponse } from "../middlewares/auth.js";
+import { uploadImage } from '../config/cloudinary.js';
 
 export const register = async (req, res) => {
   try {
@@ -141,6 +142,29 @@ export const updateProfile = async (req, res) => {
       success: false,
       message: error.message || "Error updating profile",
     });
+  }
+};
+
+export const updateProfileImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+
+    const base64String = req.file.buffer.toString('base64');
+    const dataUri = `data:${req.file.mimetype};base64,${base64String}`;
+    
+    const uploadResult = await uploadImage(dataUri, 'healthmate/profiles');
+    
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { profileImage: uploadResult.url },
+      { new: true }
+    );
+
+    res.json({ success: true, imageUrl: uploadResult.url, user });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 

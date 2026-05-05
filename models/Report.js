@@ -93,13 +93,17 @@ const reportSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isNotified: {
+      type: Boolean,
+      default: false,
+    },
     processingError: {
       type: String,
     },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 // Index for faster queries

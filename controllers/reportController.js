@@ -1,6 +1,6 @@
 // controllers/reportController.js
 import Report from "../models/Report.js";
-import { uploadImage } from "../config/cloudinary.js";
+import { uploadImage, deleteImage } from "../config/cloudinary.js";
 import { analyzeMedicalReport } from "../config/gemini.js";
 
 export const uploadReport = async (req, res) => {
@@ -262,7 +262,15 @@ export const deleteReport = async (req, res) => {
 
     // Delete from Cloudinary
     // await deleteImage(report.file.publicId);
-
+    if (report.file?.publicId) {
+      try {
+        await deleteImage(report.file.publicId);
+        console.log("✅ Cloudinary image deleted:", report.file.publicId);
+      } catch (cloudinaryError) {
+        console.error("Cloudinary delete error:", cloudinaryError);
+        // Don't fail the request if cloudinary delete fails
+      }
+    }
     await report.deleteOne();
 
     res.status(200).json({
@@ -306,5 +314,29 @@ export const getReportsStats = async (req, res) => {
       success: false,
       message: "Error fetching statistics",
     });
+  }
+};
+
+export const getPendingAnalysisReports = async (req, res) => {
+  try {
+    // Find reports that became processed in last 5 minutes
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+
+    const completed = await Report.find({
+      userId: req.user.id,
+      isProcessed: true,
+      updatedAt: { $gte: fiveMinutesAgo },
+      isNotified: { $ne: true }, // Assuming you add this field
+    }).select("_id title");
+
+    // Mark as notified
+    await Report.updateMany(
+      { _id: { $in: completed.map((r) => r._id) } },
+      { isNotified: true },
+    );
+
+    res.json({ success: true, completed });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
